@@ -12,6 +12,8 @@
 - Python startswith() 方法用于检查字符串是否是以指定子字符串开头，如果是则返回 True，否则返回 False。如果参数 beg 和 end 指定值，则在指定范围内检查。
 
 
+
+
 ```python
 import pandas as pd
 import numpy as np
@@ -2048,11 +2050,6 @@ df['Math'].clip(33,80).head()
 
 
 ```python
-mad是什么？需要补充
-```
-
-
-```python
 df['Math'].mad()
 ```
 
@@ -2771,15 +2768,17 @@ df.sort_values(by=['Address','Height']).head()
 #### 【问题一】 Series和DataFrame有哪些常见属性和方法？
 
 series
-- to_frame
-
+- value
+- name
+- index
+- dtype
+- mean()
  
 dataFrame 
-- read_csv read_txt read_excel read_sql to_csv to_txt to_excel to_sql
 - info describe
-- drop append apply assinge 
+- drop append apply assign del
 - rename 
--
+- index、columns、values、shape、mean() 
 
 
 #### 【问题二】 value_counts会统计缺失值吗？
@@ -2787,11 +2786,12 @@ dataFrame
 
 #### 【问题三】 与idxmax和nlargest功能相反的是哪两组函数？
 idxmin  nlmallest
+
 #### 【问题四】 在常用函数一节中，由于一些函数的功能比较简单，因此没有列入，现在将它们列在下面，请分别说明它们的用途并尝试使用。
 #### sum/mean/median/mad/min/max/abs/std/var/quantile/cummax/cumsum/cumprod
 
-sum 求和/mean 平均值 /median 中位数 /mad 不知道 /min 最小值 /max 最大值 /abs 平均值 /std 标准差 /var 不知道 /quantile/cummax/cumsum/cumprod
-
+sum 求和/mean 平均值 /median 中位数 /mad 根据平均值计算平均绝对距离差 /min 最小值 /max 最大值 /abs 平均值/std 标准差 / var 方差 / quantile(0.1)  10%分位数
+ / cumsum 对每一列累加 / cumprod 样本值得累计积
 #### 【问题五】 df.mean(axis=1)是什么意思？它与df.mean()的结果一样吗？第一问提到的函数也有axis参数吗？怎么使用？
 
 不一样，行平均值，df.mean()是列平均值
