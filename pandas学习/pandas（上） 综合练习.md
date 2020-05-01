@@ -852,33 +852,604 @@ df.loc[df['zengyi'].idxmin()]
 
 
 ```python
+df = pd.read_csv('数据集/2007年-2019年俄罗斯货运航班运载量.csv')
+df.groupby('Year')['Whole year'].sum()
+```
+
+
+
+
+    Year
+    2007    659438.23
+    2008    664682.46
+    2009    560809.77
+    2010    693033.98
+    2011    818691.71
+    2012    846388.03
+    2013    792337.08
+    2014    729457.12
+    2015    630208.97
+    2016    679370.15
+    2017    773662.28
+    2018    767095.28
+    2019    764606.27
+    Name: Whole year, dtype: float64
+
+
+
+(2) 每年记录的机场都是相同的吗？
+
+不是
+
+
+```python
+df['Airport name'].duplicated()
+```
+
+
+
+
+    0       False
+    1       False
+    2       False
+    3       False
+    4       False
+            ...  
+    3706     True
+    3707     True
+    3708     True
+    3709     True
+    3710     True
+    Name: Airport name, Length: 3711, dtype: bool
+
+
+
+(3) 按年计算2010 年-2015 年全年货运量记录为0 的机场航班比例。
+
+
+```python
+df_a = pd.DataFrame({'全年航班':df[(df.Year >= 2010)&(df.Year <=2015)].groupby('Year')['Airport name'].count(),
+'货运量为0航班数':df[(df.Year >= 2010)&(df.Year <=2015)&(df['Whole year']== 0)].groupby('Year')['Airport name'].count()})
+df_a['比例']= df_a['货运量为0航班数']/df_a['全年航班']
+df_a
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>全年航班</th>
+      <th>货运量为0航班数</th>
+      <th>比例</th>
+    </tr>
+    <tr>
+      <th>Year</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2010</th>
+      <td>292</td>
+      <td>224</td>
+      <td>0.767123</td>
+    </tr>
+    <tr>
+      <th>2011</th>
+      <td>292</td>
+      <td>225</td>
+      <td>0.770548</td>
+    </tr>
+    <tr>
+      <th>2012</th>
+      <td>292</td>
+      <td>225</td>
+      <td>0.770548</td>
+    </tr>
+    <tr>
+      <th>2013</th>
+      <td>292</td>
+      <td>225</td>
+      <td>0.770548</td>
+    </tr>
+    <tr>
+      <th>2014</th>
+      <td>292</td>
+      <td>225</td>
+      <td>0.770548</td>
+    </tr>
+    <tr>
+      <th>2015</th>
+      <td>292</td>
+      <td>225</td>
+      <td>0.770548</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+(4) 若某机场至少存在5 年或以上满足所有月运量记录都为0，则将其所有年份的记录信息从表中删除，并返回处理后的表格
+
+
+```python
+m = df[df['Whole year'] == 0].groupby('Airport name')['Airport name'].count().loc[lambda x:x<5].index.tolist()
+df4 = df[df['Airport name'].isin(m)]
+df4
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Airport name</th>
+      <th>Year</th>
+      <th>January</th>
+      <th>February</th>
+      <th>March</th>
+      <th>April</th>
+      <th>May</th>
+      <th>June</th>
+      <th>July</th>
+      <th>August</th>
+      <th>September</th>
+      <th>October</th>
+      <th>November</th>
+      <th>December</th>
+      <th>Whole year</th>
+      <th>Airport coordinates</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>53</th>
+      <td>Ivanovo (Yuzhny)</td>
+      <td>2019</td>
+      <td>7.22</td>
+      <td>30.39</td>
+      <td>27.51</td>
+      <td>52.34</td>
+      <td>36.47</td>
+      <td>71.11</td>
+      <td>51.24</td>
+      <td>41.46</td>
+      <td>96.01</td>
+      <td>30.70</td>
+      <td>70.23</td>
+      <td>31.29</td>
+      <td>545.97</td>
+      <td>(Decimal('40.94371'), Decimal('56.942303'))</td>
+    </tr>
+    <tr>
+      <th>62</th>
+      <td>Kazan</td>
+      <td>2019</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>(Decimal('49.298591'), Decimal('55.608089'))</td>
+    </tr>
+    <tr>
+      <th>89</th>
+      <td>Magadan (Falcon)</td>
+      <td>2019</td>
+      <td>429.00</td>
+      <td>565.00</td>
+      <td>625.00</td>
+      <td>656.00</td>
+      <td>621.00</td>
+      <td>656.00</td>
+      <td>647.00</td>
+      <td>626.00</td>
+      <td>678.00</td>
+      <td>704.00</td>
+      <td>674.00</td>
+      <td>929.00</td>
+      <td>7810.00</td>
+      <td>(Decimal('150.73116'), Decimal('59.914272'))</td>
+    </tr>
+    <tr>
+      <th>108</th>
+      <td>Nazran (Magas)</td>
+      <td>2019</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>(Decimal('44.81624'), Decimal('43.171501'))</td>
+    </tr>
+    <tr>
+      <th>144</th>
+      <td>Perm (Bolshoye Savino)</td>
+      <td>2019</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>(Decimal('56.010461'), Decimal('57.91612'))</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>3487</th>
+      <td>Ivanovo (Yuzhny)</td>
+      <td>2007</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>(Decimal('40.94371'), Decimal('56.942303'))</td>
+    </tr>
+    <tr>
+      <th>3497</th>
+      <td>Kazan</td>
+      <td>2007</td>
+      <td>271.49</td>
+      <td>467.43</td>
+      <td>617.18</td>
+      <td>435.91</td>
+      <td>509.08</td>
+      <td>258.81</td>
+      <td>234.47</td>
+      <td>343.70</td>
+      <td>728.24</td>
+      <td>275.79</td>
+      <td>469.25</td>
+      <td>570.93</td>
+      <td>5182.28</td>
+      <td>(Decimal('49.298591'), Decimal('55.608089'))</td>
+    </tr>
+    <tr>
+      <th>3530</th>
+      <td>Magadan (Falcon)</td>
+      <td>2007</td>
+      <td>198.00</td>
+      <td>220.00</td>
+      <td>267.00</td>
+      <td>274.00</td>
+      <td>262.00</td>
+      <td>406.00</td>
+      <td>408.00</td>
+      <td>400.00</td>
+      <td>374.00</td>
+      <td>276.00</td>
+      <td>262.00</td>
+      <td>299.00</td>
+      <td>3646.00</td>
+      <td>(Decimal('150.73116'), Decimal('59.914272'))</td>
+    </tr>
+    <tr>
+      <th>3594</th>
+      <td>Perm (Bolshoye Savino)</td>
+      <td>2007</td>
+      <td>89.46</td>
+      <td>130.56</td>
+      <td>154.04</td>
+      <td>156.21</td>
+      <td>181.94</td>
+      <td>141.94</td>
+      <td>183.46</td>
+      <td>218.40</td>
+      <td>223.29</td>
+      <td>191.38</td>
+      <td>299.51</td>
+      <td>256.01</td>
+      <td>2226.20</td>
+      <td>(Decimal('56.010461'), Decimal('57.91612'))</td>
+    </tr>
+    <tr>
+      <th>3608</th>
+      <td>Rostov-on-Don</td>
+      <td>2007</td>
+      <td>305.90</td>
+      <td>285.30</td>
+      <td>406.60</td>
+      <td>475.70</td>
+      <td>479.10</td>
+      <td>525.20</td>
+      <td>576.80</td>
+      <td>602.90</td>
+      <td>593.70</td>
+      <td>595.00</td>
+      <td>544.00</td>
+      <td>588.00</td>
+      <td>5978.20</td>
+      <td>(Decimal('39.929081'), Decimal('47.488342'))</td>
+    </tr>
+  </tbody>
+</table>
+<p>67 rows × 16 columns</p>
+</div>
+
+
+
+(5) 采用一种合理的方式将所有机场划分为东南西北四个分区，并给出2017年-2019 年货运总量最大的区域。
+
+
+```python
 
 ```
 
-(2) 每年记录的机场都是相同的吗？
-(3) 按年计算2010 年-2015 年全年货运量记录为0 的机场航班比例。
-(4) 若某机场至少存在5 年或以上满足所有月运量记录都为0，则将其所有
-年份的记录信息从表中删除，并返回处理后的表格
-(5) 采用一种合理的方式将所有机场划分为东南西北四个分区，并给出2017
-年-2019 年货运总量最大的区域。
-(6) 在统计学中常常用秩代表排名，现在规定某个机场某年某个月的秩为该
-机场该月在当年所有月份中货运量的排名（例如*** 机场19 年1 月运
-量在整个19 年12 个月中排名第一，则秩为1），那么判断某月运量情
-况的相对大小的秩方法为将所有机场在该月的秩排名相加，并将这个量
-定义为每一个月的秩综合指数，请根据上述定义计算2016 年12 个月
-的秩综合指数。
+(6) 在统计学中常常用秩代表排名，现在规定某个机场某年某个月的秩为该机场该月在当年所有月份中货运量的排名（例如*** 机场19 年1 月运量在整个19 年12 个月中排名第一，则秩为1），那么判断某月运量情况的相对大小的秩方法为将所有机场在该月的秩排名相加，并将这个量定义为每一个月的秩综合指数，请根据上述定义计算2016 年12 个月的秩综合指数。
+
+
+```python
+
+```
 
 ### 三、新冠肺炎在美国的传播
 ### 问题
-(1) 用corr() 函数计算县（每行都是一个县）人口与表中最后一天记录日期
-死亡数的相关系数。
-(2) 截止到4 月1 日，统计每个州零感染县的比例。
-(3) 请找出最早出确证病例的三个县。
-(4) 按州统计单日死亡增加数，并给出哪个州在哪一天确诊数增加最大（这
-里指的是在所有州和所有天两个指标一起算，不是分别算）。
-(5) 现需对每个州编制确证与死亡表，第一列为时间，并且起始时间为该州
-开始出现死亡比例的那一天，第二列和第三列分别为确证数和死亡数，
-每个州需要保存为一个单独的csv 文件，文件名为“州名.csv”。
-(6) 现需对4 月1 日至4 月10 日编制新增确证数与新增死亡数表，第一列
-为州名，第二列和第三列分别为新增确证数和新增死亡数，分别保存为
-十个单独的csv 文件，文件名为“日期.csv”。
+
+(1) 用corr() 函数计算县（每行都是一个县）人口与表中最后一天记录日期死亡数的相关系数。
+
+
+```python
+df1 = pd.read_csv('数据集/美国死亡数.csv')
+```
+
+
+```python
+df1['Population'].corr(df1.iloc[:,-1])
+```
+
+
+
+
+    0.40384419734806903
+
+
+
+
+```python
+df2 = pd.read_csv('数据集/美国确证数.csv')
+df2['all'] = df2.loc[:,'2020/1/22':'2020/4/1'].sum(axis=1)
+```
+
+(2) 截止到4 月1 日，统计每个州零感染县的比例。 
+
+
+```python
+a = df2.groupby('Province_State')['Admin2'].nunique()
+b = df2.loc[lambda x:x['all'] == 0].groupby('Province_State')['Admin2'].nunique()
+b/a
+```
+
+
+
+
+    Province_State
+    Alabama                 0.104478
+    Alaska                  0.793103
+    Arizona                      NaN
+    Arkansas                0.293333
+    California              0.137931
+    Colorado                0.218750
+    Connecticut                  NaN
+    Delaware                     NaN
+    District of Columbia         NaN
+    Florida                 0.164179
+    Georgia                 0.119497
+    Hawaii                  0.200000
+    Idaho                   0.386364
+    Illinois                0.450980
+    Indiana                 0.108696
+    Iowa                    0.404040
+    Kansas                  0.600000
+    Kentucky                0.433333
+    Louisiana               0.046875
+    Maine                   0.187500
+    Maryland                0.041667
+    Massachusetts           0.142857
+    Michigan                0.168675
+    Minnesota               0.356322
+    Mississippi             0.060976
+    Missouri                0.391304
+    Montana                 0.625000
+    Nebraska                0.741935
+    Nevada                  0.470588
+    New Hampshire                NaN
+    New Jersey                   NaN
+    New Mexico              0.424242
+    New York                0.080645
+    North Carolina          0.150000
+    North Dakota            0.528302
+    Ohio                    0.181818
+    Oklahoma                0.376623
+    Oregon                  0.277778
+    Pennsylvania            0.104478
+    Rhode Island                 NaN
+    South Carolina          0.043478
+    South Dakota            0.530303
+    Tennessee               0.105263
+    Texas                   0.437008
+    Utah                    0.448276
+    Vermont                 0.142857
+    Virginia                0.248120
+    Washington              0.102564
+    West Virginia           0.472727
+    Wisconsin               0.319444
+    Wyoming                 0.347826
+    Name: Admin2, dtype: float64
+
+
+
+(3) 请找出最早出确证病例的三个县。 
+
+
+```python
+datelist = df2.loc[:,'2020/1/22':'2020/4/1'].columns.tolist()
+i = 0
+n = 0
+df2_top = pd.DataFrame(columns=['Admin2','Province_State'])
+while n < 4:
+    dft = df2.loc[df2[df2[datelist[i]]!=0].index,'Admin2':'Province_State']
+    i = i + 1
+    df2_top = df2_top.append(dft)
+    df2_top.drop_duplicates(inplace = True)
+    n = df2_top['Admin2'].count()
+df2_top
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Admin2</th>
+      <th>Province_State</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2969</th>
+      <td>King</td>
+      <td>Washington</td>
+    </tr>
+    <tr>
+      <th>610</th>
+      <td>Cook</td>
+      <td>Illinois</td>
+    </tr>
+    <tr>
+      <th>103</th>
+      <td>Maricopa</td>
+      <td>Arizona</td>
+    </tr>
+    <tr>
+      <th>204</th>
+      <td>Los Angeles</td>
+      <td>California</td>
+    </tr>
+    <tr>
+      <th>215</th>
+      <td>Orange</td>
+      <td>California</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+(4) 按州统计单日死亡增加数，并给出哪个州在哪一天确诊数增加最大（这 里指的是在所有州和所有天两个指标一起算，不是分别算）。
+
+
+```python
+
+```
+
+ (5) 现需对每个州编制确证与死亡表，第一列为时间，并且起始时间为该州 开始出现死亡比例的那一天，第二列和第三列分别为确证数和死亡数， 每个州需要保存为一个单独的csv 文件，文件名为“州名.csv”。 
+
+
+```python
+
+```
+
+(6) 现需对4 月1 日至4 月10 日编制新增确证数与新增死亡数表，第一列 为州名，第二列和第三列分别为新增确证数和新增死亡数，分别保存为 十个单独的csv 文件，文件名为“日期.csv”。
